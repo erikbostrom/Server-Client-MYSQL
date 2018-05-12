@@ -1,0 +1,47 @@
+*********************************************************************************
+README.in
+
+Erik Boström, 2018-04-27
+*********************************************************************************
+
+Server (server.c) läser från en MySQL databas där innehållet i filen data.csv
+måste vara uppladdat. Client (client.c) kommunicerar med servern och kan genom ett
+GTK GUI söka i posterna med valfria SQL kommandon.
+
+
+Ladda in .dat fil till MySQL
+============================
+Skapa databas "my_database":
+mysql -e "CREATE DATABASE my_database;" -u root -p
+
+Skapa tabell "my_table":
+CREATE TABLE my_table(date DATE, externalid VARCHAR(255) NOT NULL, number
+VARCHAR(255) NOT NULL, constant DOUBLE PRECISION NOT NULL, digits INT NOT NULL,
+decimals INT NOT NULL);
+
+Läs in fil till databasesen my_database (data_noheader.csv är data.csv där
+headerfilen är manuellt borttagen):
+LOAD DATA LOCAL INFILE 'data_noheader.csv' INTO TABLE data FIELDS TERMINATED
+BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+
+Kompilering
+===========
+Filerna server.c och client.c kan kompileras med gcc med följande kommandon:
+
+gcc server.c -o server `mysql_config --cflags --libs`
+gcc `pkg-config --cflags gtk+-3.0` -o client client.c `pkg-config --libs gtk+-3.0`
+
+
+Starta program
+==============
+Servern startas från kommandoraden på ett unix-system med:
+
+./server [användarnamn] [lösenord] &
+
+där användarnamn (e.g., root) och lösenord tillhör ett MySQL konto med tillhörande 
+"my_database" databas. Klienten körs utan några ytterligare argument som: 
+
+./client
+
+
